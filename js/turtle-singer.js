@@ -1102,15 +1102,16 @@ class Singer {
      * @param {Object} turtle - Turtle index in turtles.turtleList
      * @param {Object} blk - corresponding Block object index in blocks.blockList
      */
-    static processPitch(activity, note, octave, cents, turtle, blk) {
+    static processPitch(activity, note, octave, cents, turtle, blk, pitchAlreadyTransposed = false) {
         const tur = activity.turtles.ithTurtle(turtle);
+        const pitchTransposition = pitchAlreadyTransposed ? 0 : pitchTransposition;
         const edo = getCurrentEDO(activity.logo.synth.inTemperament);
         let noteObj = Singer.addScalarTransposition(
             activity.logo,
             turtle,
             note,
             octave,
-            tur.singer.scalarTransposition
+            pitchAlreadyTransposed ? 0 : tur.singer.scalarTransposition
         );
         [note, octave] = noteObj;
 
@@ -1118,7 +1119,7 @@ class Singer {
             noteObj = getNote(
                 note,
                 octave,
-                tur.singer.transposition,
+                pitchTransposition,
                 tur.singer.keySignature,
                 tur.singer.movable,
                 null,
@@ -1136,11 +1137,11 @@ class Singer {
                     octave,
                     parseInt(tur.singer.neighborStepPitch, 10)
                 );
-                if (tur.singer.transposition !== 0) {
+                if (pitchTransposition !== 0) {
                     noteObj2 = getNote(
                         noteObj2[0],
                         noteObj2[1],
-                        tur.singer.transposition,
+                        pitchTransposition,
                         tur.singer.keySignature,
                         tur.singer.movable,
                         null,
@@ -1152,7 +1153,7 @@ class Singer {
                 noteObj2 = getNote(
                     note,
                     octave,
-                    tur.singer.transposition + parseInt(tur.singer.neighborStepPitch, 10),
+                    pitchTransposition + parseInt(tur.singer.neighborStepPitch, 10),
                     tur.singer.keySignature,
                     tur.singer.movable,
                     null,
@@ -1170,7 +1171,7 @@ class Singer {
                 : 0;
 
         if (tur.singer.justMeasuring.length > 0) {
-            const transposition = tur.singer.transposition;
+            const transposition = pitchTransposition;
 
             noteObj = getNote(
                 note,
@@ -1207,7 +1208,7 @@ class Singer {
             }
 
             // Apply transpositions
-            const transposition = 2 * delta + tur.singer.transposition;
+            const transposition = 2 * delta + pitchTransposition;
             const { arpeggioTrans, anote } = Singer.resolveArpeggio(
                 activity,
                 tur,
@@ -1268,7 +1269,7 @@ class Singer {
             }
 
             // Apply transpositions
-            const transposition = 2 * delta + tur.singer.transposition;
+            const transposition = 2 * delta + pitchTransposition;
             const { arpeggioTrans, anote } = Singer.resolveArpeggio(
                 activity,
                 tur,
@@ -1343,7 +1344,7 @@ class Singer {
             }
 
             // Apply transpositions
-            const transposition = 2 * delta + tur.singer.transposition;
+            const transposition = 2 * delta + pitchTransposition;
             const { arpeggioTrans, anote } = Singer.resolveArpeggio(
                 activity,
                 tur,
@@ -1400,7 +1401,7 @@ class Singer {
             const addPitch = (note, octave, cents, isInterval, direction) => {
                 // Apply transpositions, but only to the base note of an
                 // interval: the interval notes are built from it.
-                const transposition = isInterval ? 0 : 2 * delta + tur.singer.transposition;
+                const transposition = isInterval ? 0 : 2 * delta + pitchTransposition;
                 const alen = isInterval ? 0 : tur.singer.arpeggio.length;
                 let atrans = transposition;
                 let anote = note;
@@ -1437,7 +1438,7 @@ class Singer {
                     }
                 }
 
-                const register = isInterval ? 0 : tur.singer.register;
+                const register = isInterval || pitchAlreadyTransposed ? 0 : tur.singer.register;
                 const pitchTransform = atrans + register * getOctaveInterval(activity);
                 noteObj = getNote(
                     anote,
@@ -1455,7 +1456,7 @@ class Singer {
                 // (2) apply ratio
                 // (3) convert back to pitch, octave, cents
                 let ratio = 1;
-                const transpositionRatios = isInterval ? [] : tur.singer.transpositionRatios;
+                const transpositionRatios = isInterval || pitchAlreadyTransposed ? [] : tur.singer.transpositionRatios;
                 for (let i = 0, len = transpositionRatios.length; i < len; i++) {
                     ratio *= transpositionRatios[i];
                 }
@@ -1586,7 +1587,7 @@ class Singer {
             tur.singer.pushedNote = true;
         } else if (tur.singer.drumStyle.length > 0) {
             const drumname = last(tur.singer.drumStyle);
-            const transposition = tur.singer.transposition;
+            const transposition = pitchTransposition;
 
             const noteObj1 = getNote(
                 note,
@@ -1626,7 +1627,7 @@ class Singer {
             );
         } else if (activity.logo.inMusicKeyboard) {
             // Apply transpositions
-            const transposition = 2 * delta + tur.singer.transposition;
+            const transposition = 2 * delta + pitchTransposition;
 
             const nnote = getNote(
                 note,
@@ -1669,8 +1670,8 @@ class Singer {
             const addPitch = (note, octave, cents, isInterval, direction) => {
                 // Apply transpositions, but only to the base note of an
                 // interval: the interval notes are built from it.
-                const transposition = isInterval ? 0 : 2 * delta + tur.singer.transposition;
-                const register = isInterval ? 0 : tur.singer.register;
+                const transposition = isInterval ? 0 : 2 * delta + pitchTransposition;
+                const register = isInterval || pitchAlreadyTransposed ? 0 : tur.singer.register;
 
                 const pitchTransform = transposition + register * getOctaveInterval(activity);
                 const noteObj = getNote(
