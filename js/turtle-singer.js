@@ -1102,7 +1102,15 @@ class Singer {
      * @param {Object} turtle - Turtle index in turtles.turtleList
      * @param {Object} blk - corresponding Block object index in blocks.blockList
      */
-    static processPitch(activity, note, octave, cents, turtle, blk, pitchAlreadyTransposed = false) {
+    static processPitch(
+        activity,
+        note,
+        octave,
+        cents,
+        turtle,
+        blk,
+        pitchAlreadyTransposed = false
+    ) {
         const tur = activity.turtles.ithTurtle(turtle);
         const pitchTransposition = pitchAlreadyTransposed ? 0 : tur.singer.transposition;
         const edo = getCurrentEDO(activity.logo.synth.inTemperament);
@@ -1456,7 +1464,8 @@ class Singer {
                 // (2) apply ratio
                 // (3) convert back to pitch, octave, cents
                 let ratio = 1;
-                const transpositionRatios = isInterval || pitchAlreadyTransposed ? [] : tur.singer.transpositionRatios;
+                const transpositionRatios =
+                    isInterval || pitchAlreadyTransposed ? [] : tur.singer.transpositionRatios;
                 for (let i = 0, len = transpositionRatios.length; i < len; i++) {
                     ratio *= transpositionRatios[i];
                 }

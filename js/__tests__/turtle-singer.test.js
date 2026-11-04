@@ -3261,6 +3261,37 @@ describe("processPitch internal addPitch behavior", () => {
         expect(turtleMock.singer.pushedNote).toBe(true);
     });
 
+    test("does not reapply active pitch transforms to a resolved Scalar Step", () => {
+        const blk = "blk";
+        turtleMock.singer.inNoteBlock = [blk];
+        turtleMock.singer.scalarTransposition = 2;
+        turtleMock.singer.transposition = 2;
+        turtleMock.singer.register = 1;
+        turtleMock.singer.transpositionRatios = [2];
+        const addScalarTransposition = jest.spyOn(Singer, "addScalarTransposition");
+        mockGlobals.getNote.mockClear();
+
+        Singer.processPitch(activityMock, "C", 4, 0, turtleMock, blk, true);
+
+        expect(addScalarTransposition).toHaveBeenCalledWith(
+            activityMock.logo,
+            turtleMock,
+            "C",
+            4,
+            0
+        );
+        expect(mockGlobals.getNote).toHaveBeenCalledWith(
+            "C",
+            4,
+            0,
+            turtleMock.singer.keySignature,
+            turtleMock.singer.movable,
+            undefined,
+            undefined,
+            activityMock.logo.synth.inTemperament
+        );
+    });
+
     test("should map pitch to drum when drumStyle is active", () => {
         const blk = "blk";
         turtleMock.singer.drumStyle = ["snare"];

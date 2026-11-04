@@ -332,6 +332,17 @@ describe("Tests for Singer.PitchActions setup", () => {
             );
         });
 
+        test("processes Scalar Step from an already transposed pitch", () => {
+            turtle.singer.lastNotePlayed = ["D4", 4];
+            activity.logo.inMatrix = true;
+            const processPitch = jest.spyOn(Singer, "processPitch");
+
+            Singer.PitchActions.stepPitch(2, 0, blkId);
+
+            expect(processPitch).toHaveBeenCalledWith(activity, "C", 4, 0, 0, blkId, true);
+            processPitch.mockRestore();
+        });
+
         test("stepPitch handles numeric‑frequency lastNotePlayed branch", () => {
             turtle.singer.lastNotePlayed = [440];
             turtle.singer.inNoteBlock = [];
