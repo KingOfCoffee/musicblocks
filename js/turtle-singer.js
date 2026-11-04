@@ -1104,7 +1104,7 @@ class Singer {
      */
     static processPitch(activity, note, octave, cents, turtle, blk, pitchAlreadyTransposed = false) {
         const tur = activity.turtles.ithTurtle(turtle);
-        const pitchTransposition = pitchAlreadyTransposed ? 0 : pitchTransposition;
+        const pitchTransposition = pitchAlreadyTransposed ? 0 : tur.singer.transposition;
         const edo = getCurrentEDO(activity.logo.synth.inTemperament);
         let noteObj = Singer.addScalarTransposition(
             activity.logo,
