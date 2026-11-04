@@ -179,7 +179,7 @@ function setupPitchActions(activity) {
                 value
             );
 
-            Singer.processPitch(activity, noteObj[0], noteObj[1], cents, turtle, blk);
+            Singer.processPitch(activity, noteObj[0], noteObj[1], cents, turtle, blk, true);
             return;
         }
 
